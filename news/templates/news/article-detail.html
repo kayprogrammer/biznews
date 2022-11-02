@@ -1,0 +1,180 @@
+{% extends 'general/index.html' %}
+
+{% load static %}
+
+{% block title %}{{article.title}}{% endblock %}
+
+{% block content %}
+    <style>
+        .comment-avatar {
+            width: 75px;
+            height: 75px;
+            line-height: 75px;
+            border-radius: 50%;
+            font-size: 30px;
+            color: #fff;
+            text-align: center;
+            background: #000
+        }
+        .reply-avatar {
+            width: 65px;
+            height: 65px;
+            line-height: 65px;
+            border-radius: 50%;
+            font-size: 25px;
+            color: #fff;
+            text-align: center;
+            background: #000
+        }
+    </style>
+    
+    <!-- Breaking News Start -->
+    <div class="container-fluid mt-5 mb-3 pt-3">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between">
+                        <div class="section-title border-right-0 mb-0" style="width: 180px;">
+                            <h4 class="m-0 text-uppercase font-weight-bold">Trending</h4>
+                        </div>
+                        <div class="owl-carousel tranding-carousel position-relative d-inline-flex align-items-center bg-white border border-left-0"
+                            style="width: calc(100% - 180px); padding-right: 100px;">
+                            {% for article in trending_articles %}
+                                <div class="text-truncate"><a class="text-secondary text-uppercase font-weight-semi-bold" href="{{article.get_absolute_url}}">{{article.title}}</a></div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Breaking News End -->
+    
+    <!-- Avatar Display Modal -->
+    <div class="modal fade" id="avatarDisplay" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel" style="font-weight: bold !important;">{{article.admin.full_name}}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+            <img style="width:100%;" src="{{article.admin.avatarURL}}" />
+            </div>
+            
+        </div>
+        </div>
+    </div>
+
+    <!-- News With Sidebar Start -->
+    <div class="container-fluid">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- News Detail Start -->
+                    <div class="position-relative mb-3">
+                        <img class="img-fluid w-100" src="{{article.imageURL}}" style="object-fit: cover; height: 400px;">
+                        <div class="bg-white border border-top-0 p-4">
+                            <div class="mb-3">
+                                <a class="badge badge-primary text-uppercase font-weight-semi-bold p-2 mr-2"
+                                    href="">{{article.category.name}}</a>
+                                <a class="text-body" href="">{{article.timestamp|date:"M j, Y"}}</a>
+                            </div>
+                            <h1 class="mb-3 text-secondary text-uppercase font-weight-bold">{{article.title}}</h1>
+                            {{article.text|safe}}
+                        </div>
+                        <div class="d-flex justify-content-between bg-white border border-top-0 p-4">
+                            <div class="d-flex align-items-center">
+                                <img data-toggle="modal" data-target="#avatarDisplay" class="rounded-circle mr-2" src="{{article.admin.avatarURL}}" style="object-fit: cover; object-position: top; cursor: pointer;" width="25" height="25" alt="">
+                                <span>{{article.admin.full_name}}</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="ml-3"><i class="far fa-eye mr-2"></i>{{article.views}}</span>
+                                <span class="ml-3"><i class="far fa-comment mr-2"></i>{{article.comments.all.count}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- News Detail End -->
+
+                    <!-- Comment List Start -->
+                    <div class="mb-3">
+                        <div class="section-title mb-0">
+                            <h4 class="m-0 text-uppercase font-weight-bold">{% if article.comments.all.count == 1 %}1 Comment{% else %}{{article.comments.all.count}} Comments{% endif %}</h4>
+                        </div>
+                        <div class="bg-white border border-top-0 p-4">
+                            <div class="media">
+                                {% for comment in article.comments.all %}
+                                    <h1 class="comment-avatar">{{comment.name|make_list|first}}{{comment.name|make_list|last|upper}}</h1>
+                                    <div class="media-body ml-2">
+                                        <h6><a class="text-secondary font-weight-bold">{{comment.name}}</a> <small><i>{{comment.nice_timestamp}}</i></small></h6>
+                                        <p style="font-size: 13px;">{{comment.message}}</p>
+                                        <button class="btn btn-sm btn-outline-secondary">Reply</button>
+                                        {% for reply in comment.replies.all %}
+                                        <div class="media mt-4" style="position: relative; left: -55px;">
+                                            <h1 class="reply-avatar">{{reply.name|make_list|first}}{{reply.name|make_list|last|upper}}</h1>
+                                            <div class="media-body ml-2">
+                                                <h6><a class="text-secondary font-weight-bold" href="">{{reply.name}}</a> <small><i>{{reply.nice_timestamp}}</i></small></h6>
+                                                <p style="font-size: 12px;">{{reply.message}}</p>
+                                            </div>
+                                        </div>
+                                        {% empty %}
+                                            <p style="font-size: 12px; color: blue; font-weight: bold;">Be the first to reply to this comment!</p>
+                                        {% endfor %}
+                                    </div>
+                                {% empty %}
+                                    <p style="font-size: 13px; color: blue; font-weight: bold;">Be the first to write a comment!</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Comment List End -->
+
+                    <!-- Comment Form Start -->
+                    <div class="mb-3">
+                        <div class="section-title mb-0">
+                            <h4 class="m-0 text-uppercase font-weight-bold">Leave a comment</h4>
+                        </div>
+                        <div class="bg-white border border-top-0 p-4">
+                            <form>
+                                <div class="form-row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="name">Name *</label>
+                                            <input type="text" class="form-control" id="name">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="email">Email *</label>
+                                            <input type="email" class="form-control" id="email">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="website">Website</label>
+                                    <input type="url" class="form-control" id="website">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="message">Message *</label>
+                                    <textarea id="message" cols="30" rows="5" class="form-control"></textarea>
+                                </div>
+                                <div class="form-group mb-0">
+                                    <input type="submit" value="Leave a comment"
+                                        class="btn btn-primary font-weight-semi-bold py-2 px-3">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- Comment Form End -->
+                </div>
+                {% include 'news/follow.html' %}
+            </div>
+        </div>
+    </div>
+    <!-- News With Sidebar End -->
+{% endblock %}
+{% block js %}
+{% endblock %}
