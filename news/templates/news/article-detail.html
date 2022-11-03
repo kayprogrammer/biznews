@@ -137,29 +137,30 @@
                             <h4 class="m-0 text-uppercase font-weight-bold">Leave a comment</h4>
                         </div>
                         <div class="bg-white border border-top-0 p-4">
-                            <form>
+                            <form method="POST" class="comment-form">
+                                {% csrf_token %}
                                 <div class="form-row">
                                     <div class="col-sm-6">
                                         <div class="form-group">
                                             <label for="name">Name *</label>
-                                            <input type="text" class="form-control" id="name">
+                                            {{comment_form.name}}
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group">
                                             <label for="email">Email *</label>
-                                            <input type="email" class="form-control" id="email">
+                                            {{comment_form.email}}
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="website">Website</label>
-                                    <input type="url" class="form-control" id="website">
+                                    {{comment_form.website}}
                                 </div>
 
                                 <div class="form-group">
                                     <label for="message">Message *</label>
-                                    <textarea id="message" cols="30" rows="5" class="form-control"></textarea>
+                                    {{comment_form.message}}
                                 </div>
                                 <div class="form-group mb-0">
                                     <input type="submit" value="Leave a comment"
@@ -177,4 +178,7 @@
     <!-- News With Sidebar End -->
 {% endblock %}
 {% block js %}
+    <script type="text/javascript">
+        
+    </script>
 {% endblock %}
